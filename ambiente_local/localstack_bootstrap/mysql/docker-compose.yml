@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'boaentregadb'
+      MYSQL_USER: 'pozzi'
+      MYSQL_PASSWORD: '12345fe#'
+      MYSQL_ROOT_PASSWORD: '12345fe'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-boaentregadb:/var/lib/mysql
+volumes:
+  my-boaentregadb:
