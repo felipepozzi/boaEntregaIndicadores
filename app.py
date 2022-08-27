@@ -1,10 +1,11 @@
 from http.client import HTTPException, BAD_REQUEST
 
-from flask import Flask, request, jsonify, abort, render_template
+from flask import Flask, request, jsonify, abort
 import dbConnector as dbMysql
 import dynamoConnect as dynamoConnect
 
 app = Flask(__name__)
+
 
 @app.route('/boaentrega/indicadores', methods=['GET'])
 def get_indicadores():
@@ -31,6 +32,23 @@ def get_indicadores():
 
     except HTTPException as e:
         return HTTPException(422, "erro ao realizar consulta", jsonify({'error': e}))
+
+
+@app.route('/boaentrega/indicadores', methods=['POST'])
+def post_indicadores():
+    try:
+        if request.is_json:
+            body = request.get_json()
+
+            if body is None:
+                abort(BAD_REQUEST)
+
+            response = dbMysql.saveIndicadores(body)
+            print(response)
+            return app.response_class(response=response, mimetype='application/json')
+
+    except HTTPException as e:
+        return HTTPException(422, "erro ao realizar a gravação do evento na base", jsonify({'error': e}))
 
 
 @app.route('/boaentrega/eventos_historicos', methods=['POST'])

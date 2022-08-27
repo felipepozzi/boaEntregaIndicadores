@@ -10,6 +10,7 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
+
 def selectIndicadorOtp(dataInicio, dataFim):
     mycursor.execute("select id_entrega, data_hora_compra, data_hora_inicio_sepracao, data_hora_fim_sepracao, " +
                      "data_hora_entrega, status_entrega, id_rota, valor_frete," +
@@ -22,6 +23,22 @@ def selectIndicadorOtp(dataInicio, dataFim):
         json_data.append(dict(zip(row_headers, row)))
     return json.dumps(json_data)
 
+
+def saveIndicadores(body):
+    sql = "INSERT INTO entregas (id_entrega, data_hora_compra, data_hora_inicio_sepracao, data_hora_fim_sepracao, " \
+          " data_hora_entrega, status_entrega, id_rota, valor_frete, latitude_origem, longitude_origem, " \
+          " latitude_destino, longitude_destino, pontualidade, coformidade) values (%s, %s, %s, %s, %s, %s, %s, %s, " \
+          " %s, %s, %s, %s, %s, %s)"
+    val = (body['id_entrega'], body['data_hora_compra'], body['data_hora_inicio_sepracao'], body['data_hora_fim_sepracao'],
+           body['data_hora_entrega'], body['status_entrega'], body['id_rota'], body['valor_frete'], body['latitude_origem'],
+           body['longitude_origem'], body['latitude_destino'], body['longitude_destino'], body['entrega_realizada_dentro_prazo'],
+           body['conformidade'])
+    mycursor.execute(sql, val)
+    mydb.commit()
+
+    return json.dumps("{}")
+
+
 def selectIndicadorOtd(dataInicio, dataFim):
     mycursor.execute("SELECT count(distinct id_entrega) AS total_entregas, " +
     " count(distinct if(status_entrega = 'Efetuada no Prazo' , id_entrega, null )) AS entregas_sucesso" +
@@ -32,6 +49,7 @@ def selectIndicadorOtd(dataInicio, dataFim):
         indicador_otd=lst
     )
     return response.data
+
 
 def selectIndicadorOtif(dataInicio, dataFim):
     mycursor.execute("SELECT count(distinct id_entrega) AS total_entregas, " +
